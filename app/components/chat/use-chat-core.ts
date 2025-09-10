@@ -1,6 +1,6 @@
 import { useChatDraft } from "@/app/hooks/use-chat-draft"
 import { toast } from "@/components/ui/toast"
-import { getOrCreateGuestUserId } from "@/lib/api"
+import { getUserId } from "@/lib/api"
 import { MESSAGE_MAX_LENGTH, SYSTEM_PROMPT_DEFAULT } from "@/lib/config"
 import { Attachment } from "@/lib/file-handling"
 import { API_ROUTE_CHAT } from "@/lib/routes"
@@ -21,7 +21,6 @@ type UseChatCoreProps = {
     files: File[]
   ) => Array<{ name: string; contentType: string; url: string }>
   setFiles: (files: File[]) => void
-  checkLimitsAndNotify: (uid: string) => Promise<boolean>
   cleanupOptimisticAttachments: (attachments?: Array<{ url?: string }>) => void
   ensureChatExists: (uid: string, input: string) => Promise<string | null>
   handleFileUploads: (
@@ -42,7 +41,6 @@ export function useChatCore({
   files,
   createOptimisticAttachments,
   setFiles,
-  checkLimitsAndNotify,
   cleanupOptimisticAttachments,
   ensureChatExists,
   handleFileUploads,
@@ -102,6 +100,7 @@ export function useChatCore({
     initialInput: draftValue,
     onFinish: cacheAndAddMessage,
     onError: handleError,
+    streamProtocol: "text",
   })
 
   // Handle search params on mount
@@ -125,7 +124,7 @@ export function useChatCore({
   const submit = useCallback(async () => {
     setIsSubmitting(true)
 
-    const uid = await getOrCreateGuestUserId(user)
+    const uid = await getUserId(user)
     if (!uid) {
       setIsSubmitting(false)
       return
@@ -151,13 +150,6 @@ export function useChatCore({
     setFiles([])
 
     try {
-      const allowed = await checkLimitsAndNotify(uid)
-      if (!allowed) {
-        setMessages((prev) => prev.filter((m) => m.id !== optimisticId))
-        cleanupOptimisticAttachments(optimisticMessage.experimental_attachments)
-        return
-      }
-
       const currentChatId = await ensureChatExists(uid, input)
       if (!currentChatId) {
         setMessages((prev) => prev.filter((msg) => msg.id !== optimisticId))
@@ -223,7 +215,6 @@ export function useChatCore({
     setMessages,
     setInput,
     setFiles,
-    checkLimitsAndNotify,
     cleanupOptimisticAttachments,
     ensureChatExists,
     handleFileUploads,
@@ -254,21 +245,13 @@ export function useChatCore({
       setMessages((prev) => [...prev, optimisticMessage])
 
       try {
-        const uid = await getOrCreateGuestUserId(user)
+        const uid = await getUserId(user)
 
         if (!uid) {
           setMessages((prev) => prev.filter((msg) => msg.id !== optimisticId))
           return
         }
-
-        const allowed = await checkLimitsAndNotify(uid)
-        if (!allowed) {
-          setMessages((prev) => prev.filter((m) => m.id !== optimisticId))
-          return
-        }
-
         const currentChatId = await ensureChatExists(uid, suggestion)
-
         if (!currentChatId) {
           setMessages((prev) => prev.filter((msg) => msg.id !== optimisticId))
           return
@@ -284,13 +267,7 @@ export function useChatCore({
           },
         }
 
-        append(
-          {
-            role: "user",
-            content: suggestion,
-          },
-          options
-        )
+        append({ role: "user", content: suggestion }, options)
         setMessages((prev) => prev.filter((msg) => msg.id !== optimisticId))
       } catch {
         setMessages((prev) => prev.filter((msg) => msg.id !== optimisticId))
@@ -304,7 +281,6 @@ export function useChatCore({
       selectedModel,
       user,
       append,
-      checkLimitsAndNotify,
       isAuthenticated,
       setMessages,
       setIsSubmitting,
@@ -313,7 +289,7 @@ export function useChatCore({
 
   // Handle reload
   const handleReload = useCallback(async () => {
-    const uid = await getOrCreateGuestUserId(user)
+    const uid = await getUserId(user)
     if (!uid) {
       return
     }
@@ -331,7 +307,7 @@ export function useChatCore({
     reload(options)
   }, [user, chatId, selectedModel, isAuthenticated, systemPrompt, reload])
 
-  // Handle input change - now with access to the real setInput function!
+  // Handle input change
   const { setDraftValue } = useChatDraft(chatId)
   const handleInputChange = useCallback(
     (value: string) => {
@@ -342,7 +318,6 @@ export function useChatCore({
   )
 
   return {
-    // Chat state
     messages,
     input,
     handleSubmit,
@@ -357,7 +332,6 @@ export function useChatCore({
     systemPrompt,
     hasSentFirstMessageRef,
 
-    // Component state
     isSubmitting,
     setIsSubmitting,
     hasDialogAuth,
@@ -365,7 +339,6 @@ export function useChatCore({
     enableSearch,
     setEnableSearch,
 
-    // Actions
     submit,
     handleSuggestion,
     handleReload,

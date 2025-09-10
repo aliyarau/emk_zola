@@ -28,7 +28,7 @@ export async function createChatInDb({
     }
   }
 
-  await checkUsageByModel(supabase, userId, model, isAuthenticated)
+  await checkUsageByModel(supabase, userId)
 
   const insertData: {
     user_id: string
@@ -37,7 +37,7 @@ export async function createChatInDb({
     project_id?: string
   } = {
     user_id: userId,
-    title: title || "New Chat",
+    title: title || "Новый чат",
     model,
   }
 

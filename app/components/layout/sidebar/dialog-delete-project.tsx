@@ -66,31 +66,34 @@ export function DialogDeleteProject({
 
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
-      <DialogContent>
+      <DialogContent className="dark:bg-secondary">
         <DialogHeader>
-          <DialogTitle>Delete Project</DialogTitle>
+          <DialogTitle>Удалить проект</DialogTitle>
           <DialogDescription>
-            Are you sure you want to delete &quot;{project.name}&quot;? This
-            action cannot be undone and will also delete all conversations in
-            this project.
+            Вы уверены, что хотите удалить{" "}
+            <span className="text-primary font-semibold">{project.name}</span>?
+            Это действие нельзя отменить, и вместе с проектом будут удалены все
+            связанные беседы.
           </DialogDescription>
         </DialogHeader>
         <DialogFooter>
           <Button
             type="button"
+            className="border-secondary rounded-full border bg-transparent shadow-none focus-visible:ring-0"
             variant="outline"
             onClick={() => setIsOpen(false)}
             disabled={deleteProjectMutation.isPending}
           >
-            Cancel
+            Отменить
           </Button>
           <Button
             type="button"
+            className="rounded-full"
             variant="destructive"
             onClick={handleConfirmDelete}
             disabled={deleteProjectMutation.isPending}
           >
-            {deleteProjectMutation.isPending ? "Deleting..." : "Delete Project"}
+            {deleteProjectMutation.isPending ? "Удаление..." : "Удалить проект"}
           </Button>
         </DialogFooter>
       </DialogContent>

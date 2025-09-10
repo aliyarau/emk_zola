@@ -8,7 +8,7 @@ import {
   MorphingPopoverTrigger,
 } from "@/components/motion-primitives/morphing-popover"
 import { isSupabaseEnabled } from "@/lib/supabase/config"
-import { QuestionMark } from "@phosphor-icons/react"
+import { MessageSquarePlus } from "lucide-react"
 import { motion } from "motion/react"
 import { useState } from "react"
 
@@ -47,7 +47,7 @@ export function FeedbackWidget({ authUserId }: FeedbackWidgetProps) {
         className="relative flex flex-col items-end justify-end"
       >
         <MorphingPopoverTrigger
-          className="border-border bg-background text-foreground hover:bg-secondary flex size-6 items-center justify-center rounded-full border shadow-md"
+          className="border-border bg-background text-foreground hover:bg-secondary flex size-10 items-center justify-center rounded-full border shadow-md"
           style={{
             transformOrigin: "bottom right",
             originX: "right",
@@ -56,7 +56,7 @@ export function FeedbackWidget({ authUserId }: FeedbackWidgetProps) {
             scaleY: 1,
           }}
         >
-          <span className="sr-only">Help</span>
+          <span className="sr-only">Оставить отзыв</span>
           <motion.span
             animate={{
               opacity: isOpen ? 0 : 1,
@@ -66,7 +66,7 @@ export function FeedbackWidget({ authUserId }: FeedbackWidgetProps) {
               delay: isOpen ? 0 : TRANSITION_POPOVER.duration / 2,
             }}
           >
-            <QuestionMark className="text-foreground size-4" />
+            <MessageSquarePlus className="text-foreground size-5" />
           </motion.span>
         </MorphingPopoverTrigger>
         <MorphingPopoverContent

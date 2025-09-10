@@ -196,7 +196,7 @@ export async function createNewChat(
       projectId?: string
     } = {
       userId,
-      title: title || "New Chat",
+      title: title || "Новый чат",
       model: model || MODEL_DEFAULT,
       isAuthenticated,
     }

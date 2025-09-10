@@ -1,121 +1,115 @@
 import {
-  BookOpenText,
-  Brain,
-  Code,
+  FileSearch,
+  GraduationCap,
   Lightbulb,
-  Notepad,
-  PaintBrush,
-  Sparkle,
-} from "@phosphor-icons/react/dist/ssr"
+  Megaphone,
+  ServerCog,
+  ShoppingCart,
+  Truck,
+} from "lucide-react"
 
-export const NON_AUTH_DAILY_MESSAGE_LIMIT = 5
 export const AUTH_DAILY_MESSAGE_LIMIT = 1000
 export const REMAINING_QUERY_ALERT_THRESHOLD = 2
-export const DAILY_FILE_UPLOAD_LIMIT = 5
-export const DAILY_LIMIT_PRO_MODELS = 500
+export const DAILY_FILE_UPLOAD_LIMIT = 100
 
-export const NON_AUTH_ALLOWED_MODELS = ["gpt-4.1-nano"]
+export const MODEL_DEFAULT = "gpt-4.1"
 
-export const FREE_MODELS_IDS = [
-  "openrouter:deepseek/deepseek-r1:free",
-  "openrouter:meta-llama/llama-3.3-8b-instruct:free",
-  "pixtral-large-latest",
-  "mistral-large-latest",
-  "gpt-4.1-nano",
-]
-
-export const MODEL_DEFAULT = "gpt-4.1-nano"
-
-export const APP_NAME = "EMK chat"
-export const APP_DOMAIN = "https://zola.chat"
+export const APP_NAME = "ChatEMK"
+export const APP_DOMAIN = "https://emkai.ru"
 
 export const SUGGESTIONS = [
   {
-    label: "Summary",
-    highlight: "Summarize",
-    prompt: `Summarize`,
+    label: "Продажи и закупки",
+    highlight: "Подскажи",
+    prompt: `Подскажи`,
     items: [
-      "Summarize the French Revolution",
-      "Summarize the plot of Inception",
-      "Summarize World War II in 5 sentences",
-      "Summarize the benefits of meditation",
+      "Подскажи, как рассчитать себестоимость металлопроката с учётом доставки",
+      "Подскажи, как правильно оформить коммерческое предложение",
+      "Подскажи, как быстрее сравнить цены поставщиков",
+      "Подскажи, как рассчитать маржинальность по заказу",
     ],
-    icon: Notepad,
+    icon: ShoppingCart, // можно взять иконку из lucide-react
   },
   {
-    label: "Code",
-    highlight: "Help me",
-    prompt: `Help me`,
+    label: "Логистика и склады",
+    highlight: "Помоги",
+    prompt: `Помоги`,
     items: [
-      "Help me write a function to reverse a string in JavaScript",
-      "Help me create a responsive navbar in HTML/CSS",
-      "Help me write a SQL query to find duplicate emails",
-      "Help me convert this Python function to JavaScript",
+      "Помоги спланировать отгрузку на следующую неделю",
+      "Помоги проверить остатки по складам",
+      "Помоги рассчитать оптимальный маршрут доставки",
+      "Помоги подготовить акт сверки по складу",
     ],
-    icon: Code,
+    icon: Truck,
   },
   {
-    label: "Design",
-    highlight: "Design",
-    prompt: `Design`,
+    label: "1С и ИТ",
+    highlight: "Объясни",
+    prompt: `Объясни`,
     items: [
-      "Design a color palette for a tech blog",
-      "Design a UX checklist for mobile apps",
-      "Design 5 great font pairings for a landing page",
-      "Design better CTAs with useful tips",
+      "Объясни, как выгрузить отчёт по продажам в 1С",
+      "Объясни, как исправить ошибку при загрузке накладной",
+      "Объясни, как создать новый справочник в 1С",
+      "Объясни, как подключиться к корпоративному VPN",
     ],
-    icon: PaintBrush,
+    icon: ServerCog,
   },
   {
-    label: "Research",
-    highlight: "Research",
-    prompt: `Research`,
+    label: "Тендеры",
+    highlight: "Разбери",
+    prompt: `Разбери`,
     items: [
-      "Research the pros and cons of remote work",
-      "Research the differences between Apple Vision Pro and Meta Quest",
-      "Research best practices for password security",
-      "Research the latest trends in renewable energy",
+      "Разбери условия участия в тендере по поставке труб",
+      "Разбери документацию на электронных торгах",
+      "Разбери требования по банковской гарантии",
+      "Разбери типичные ошибки при подготовке тендерной заявки",
     ],
-    icon: BookOpenText,
+    icon: FileSearch,
   },
   {
-    label: "Get inspired",
-    highlight: "Inspire me",
-    prompt: `Inspire me`,
+    label: "Маркетинг",
+    highlight: "Предложи",
+    prompt: `Предложи`,
     items: [
-      "Inspire me with a beautiful quote about creativity",
-      "Inspire me with a writing prompt about solitude",
-      "Inspire me with a poetic way to start a newsletter",
-      "Inspire me by describing a peaceful morning in nature",
+      "Предложи идеи для поста о нашем металлопрокате",
+      "Предложи дизайн баннера для выставки",
+      "Предложи текст для e-mail рассылки клиентам",
+      "Предложи аргументы для презентации о компании",
     ],
-    icon: Sparkle,
+    icon: Megaphone,
   },
   {
-    label: "Think deeply",
-    highlight: "Reflect on",
-    prompt: `Reflect on`,
+    label: "Обучение и развитие",
+    highlight: "Объясни просто",
+    prompt: `Объясни просто`,
     items: [
-      "Reflect on why we fear uncertainty",
-      "Reflect on what makes a conversation meaningful",
-      "Reflect on the concept of time in a simple way",
-      "Reflect on what it means to live intentionally",
+      "Объясни просто, как работает прокат стали",
+      "Объясни разницу между арматурой А400 и А500",
+      "Объясни основные этапы цепочки поставок",
+      "Объясни, как считать НДС по закупке",
     ],
-    icon: Brain,
+    icon: GraduationCap,
   },
   {
-    label: "Learn gently",
-    highlight: "Explain",
-    prompt: `Explain`,
+    label: "Идеи и улучшения",
+    highlight: "Подумай",
+    prompt: `Подумай`,
     items: [
-      "Explain quantum physics like I'm 10",
-      "Explain stoicism in simple terms",
-      "Explain how a neural network works",
-      "Explain the difference between AI and AGI",
+      "Подумай, как сократить время обработки заказов",
+      "Подумай, как автоматизировать отчёты по продажам",
+      "Подумай, как улучшить работу тендерного отдела",
+      "Подумай, как повысить узнаваемость компании",
     ],
     icon: Lightbulb,
   },
 ]
 
-export const SYSTEM_PROMPT_DEFAULT = `You are Zola, a thoughtful and clear assistant. Your tone is calm, minimal, and human. You write with intention—never too much, never too little. You avoid clichés, speak simply, and offer helpful, grounded answers. When needed, you ask good questions. You don't try to impress—you aim to clarify. You may use metaphors if they bring clarity, but you stay sharp and sincere. You're here to help the user think clearly and move forward, not to overwhelm or overperform.`
+export const SYSTEM_PROMPT_DEFAULT = `Вы — ChatEMK, корпоративный ИИ-ассистент для сотрудников. 
+Ваша задача — помогать в работе: быстро находить ответы, упрощать задачи, подсказывать решения и снижать количество ошибок. 
+
+Тон дружелюбный и деловой: пишите ясно и по делу, без клише и лишних слов. 
+При необходимости задавайте короткие уточняющие вопросы, чтобы лучше понять запрос. 
+
+Ваша цель — быть практичным помощником, который экономит время и помогает сотрудникам достигать лучших результатов.`
 
 export const MESSAGE_MAX_LENGTH = 10000

@@ -1,3 +1,4 @@
+// app/providers/user-preferences-provider.tsx
 "use client"
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
@@ -6,29 +7,18 @@ import {
   convertFromApiFormat,
   convertToApiFormat,
   defaultPreferences,
-  type LayoutType,
   type UserPreferences,
 } from "./utils"
 
-export {
-  type LayoutType,
-  type UserPreferences,
-  convertFromApiFormat,
-  convertToApiFormat,
-}
+export { type UserPreferences, convertFromApiFormat, convertToApiFormat }
 
 const PREFERENCES_STORAGE_KEY = "user-preferences"
-const LAYOUT_STORAGE_KEY = "preferred-layout"
 
 interface UserPreferencesContextType {
   preferences: UserPreferences
-  setLayout: (layout: LayoutType) => void
   setPromptSuggestions: (enabled: boolean) => void
   setShowToolInvocations: (enabled: boolean) => void
   setShowConversationPreviews: (enabled: boolean) => void
-  setMultiModelEnabled: (enabled: boolean) => void
-  toggleModelVisibility: (modelId: string) => void
-  isModelHidden: (modelId: string) => boolean
   isLoading: boolean
 }
 
@@ -50,9 +40,7 @@ async function updateUserPreferences(
 ): Promise<UserPreferences> {
   const response = await fetch("/api/user-preferences", {
     method: "PUT",
-    headers: {
-      "Content-Type": "application/json",
-    },
+    headers: { "Content-Type": "application/json" },
     body: JSON.stringify(convertToApiFormat(update)),
   })
 
@@ -72,22 +60,16 @@ function getLocalStoragePreferences(): UserPreferences {
     try {
       return JSON.parse(stored)
     } catch {
-      // fallback to legacy layout storage if JSON parsing fails
+      // ignore parse errors, fall back to defaults
     }
   }
 
-  const layout = localStorage.getItem(LAYOUT_STORAGE_KEY) as LayoutType | null
-  return {
-    ...defaultPreferences,
-    ...(layout ? { layout } : {}),
-  }
+  return { ...defaultPreferences }
 }
 
 function saveToLocalStorage(preferences: UserPreferences) {
   if (typeof window === "undefined") return
-
   localStorage.setItem(PREFERENCES_STORAGE_KEY, JSON.stringify(preferences))
-  localStorage.setItem(LAYOUT_STORAGE_KEY, preferences.layout)
 }
 
 export function UserPreferencesProvider({
@@ -102,28 +84,17 @@ export function UserPreferencesProvider({
   const isAuthenticated = !!userId
   const queryClient = useQueryClient()
 
-  // Merge initial preferences with defaults
   const getInitialData = (): UserPreferences => {
-    if (initialPreferences && isAuthenticated) {
-      return initialPreferences
-    }
-
-    if (!isAuthenticated) {
-      return getLocalStoragePreferences()
-    }
-
+    if (initialPreferences && isAuthenticated) return initialPreferences
+    if (!isAuthenticated) return getLocalStoragePreferences()
     return defaultPreferences
   }
 
-  // Query for user preferences
   const { data: preferences = getInitialData(), isLoading } =
     useQuery<UserPreferences>({
       queryKey: ["user-preferences", userId],
       queryFn: async () => {
-        if (!isAuthenticated) {
-          return getLocalStoragePreferences()
-        }
-
+        if (!isAuthenticated) return getLocalStoragePreferences()
         try {
           return await fetchUserPreferences()
         } catch (error) {
@@ -135,17 +106,12 @@ export function UserPreferencesProvider({
         }
       },
       enabled: typeof window !== "undefined",
-      staleTime: 1000 * 60 * 5, // 5 minutes
-      retry: (failureCount, error) => {
-        // Only retry for authenticated users and network errors
-        return isAuthenticated && failureCount < 2
-      },
-      // Use initial data if available to avoid unnecessary API calls
+      staleTime: 1000 * 60 * 5,
+      retry: (failureCount) => isAuthenticated && failureCount < 2,
       initialData:
         initialPreferences && isAuthenticated ? getInitialData() : undefined,
     })
 
-  // Mutation for updating preferences
   const mutation = useMutation({
     mutationFn: async (update: Partial<UserPreferences>) => {
       const updated = { ...preferences, ...update }
@@ -188,12 +154,6 @@ export function UserPreferencesProvider({
 
   const updatePreferences = mutation.mutate
 
-  const setLayout = (layout: LayoutType) => {
-    if (isAuthenticated || layout === "fullscreen") {
-      updatePreferences({ layout })
-    }
-  }
-
   const setPromptSuggestions = (enabled: boolean) => {
     updatePreferences({ promptSuggestions: enabled })
   }
@@ -206,35 +166,13 @@ export function UserPreferencesProvider({
     updatePreferences({ showConversationPreviews: enabled })
   }
 
-  const setMultiModelEnabled = (enabled: boolean) => {
-    updatePreferences({ multiModelEnabled: enabled })
-  }
-
-  const toggleModelVisibility = (modelId: string) => {
-    const currentHidden = preferences.hiddenModels || []
-    const isHidden = currentHidden.includes(modelId)
-    const newHidden = isHidden
-      ? currentHidden.filter((id) => id !== modelId)
-      : [...currentHidden, modelId]
-
-    updatePreferences({ hiddenModels: newHidden })
-  }
-
-  const isModelHidden = (modelId: string) => {
-    return (preferences.hiddenModels || []).includes(modelId)
-  }
-
   return (
     <UserPreferencesContext.Provider
       value={{
         preferences,
-        setLayout,
         setPromptSuggestions,
         setShowToolInvocations,
         setShowConversationPreviews,
-        setMultiModelEnabled,
-        toggleModelVisibility,
-        isModelHidden,
         isLoading,
       }}
     >

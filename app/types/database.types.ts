@@ -98,6 +98,7 @@ export type Database = {
           title: string | null
           user_id: string
           public: boolean
+          conversation_id?: string | null
         }
         Insert: {
           created_at?: string | null
@@ -108,6 +109,7 @@ export type Database = {
           title?: string | null
           user_id: string
           public?: boolean
+          conversation_id?: string | null
         }
         Update: {
           created_at?: string | null
@@ -118,6 +120,7 @@ export type Database = {
           title?: string | null
           user_id?: string
           public?: boolean
+          conversation_id?: string | null
         }
         Relationships: [
           {
@@ -185,7 +188,6 @@ export type Database = {
       }
       users: {
         Row: {
-          anonymous: boolean | null
           created_at: string | null
           daily_message_count: number | null
           daily_reset: string | null
@@ -202,7 +204,6 @@ export type Database = {
           system_prompt: string | null
         }
         Insert: {
-          anonymous?: boolean | null
           created_at?: string | null
           daily_message_count?: number | null
           daily_reset?: string | null
@@ -219,7 +220,6 @@ export type Database = {
           system_prompt?: string | null
         }
         Update: {
-          anonymous?: boolean | null
           created_at?: string | null
           daily_message_count?: number | null
           daily_reset?: string | null

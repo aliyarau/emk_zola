@@ -8,7 +8,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { DotsThree, PencilSimple, Trash } from "@phosphor-icons/react"
+import { Ellipsis, Pencil, Trash2 } from "lucide-react"
 import { useState } from "react"
 
 type Project = {
@@ -44,7 +44,7 @@ export function SidebarProjectMenu({
             className="hover:bg-secondary flex size-7 items-center justify-center rounded-md p-1 transition-colors duration-150"
             onClick={(e) => e.stopPropagation()}
           >
-            <DotsThree size={18} className="text-primary" weight="bold" />
+            <Ellipsis size={18} />
           </button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end" className="w-40">
@@ -56,8 +56,8 @@ export function SidebarProjectMenu({
               onStartEditing()
             }}
           >
-            <PencilSimple size={16} className="mr-2" />
-            Rename
+            <Pencil size={16} />
+            Переименовать
           </DropdownMenuItem>
           <DropdownMenuItem
             className="text-destructive"
@@ -68,8 +68,8 @@ export function SidebarProjectMenu({
               setIsDeleteDialogOpen(true)
             }}
           >
-            <Trash size={16} className="mr-2" />
-            Delete
+            <Trash2 size={16} />
+            Удалить
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>

@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button"
 import { toast } from "@/components/ui/toast"
 import { createClient } from "@/lib/supabase/client"
 import { isSupabaseEnabled } from "@/lib/supabase/config"
-import { CaretLeft, SealCheck, Spinner } from "@phosphor-icons/react"
+import { BadgeCheck, ChevronLeft, Loader } from "lucide-react"
 import { AnimatePresence, motion } from "motion/react"
 import { useState } from "react"
 
@@ -89,7 +89,7 @@ export function FeedbackForm({ authUserId, onClose }: FeedbackFormProps) {
   }
 
   return (
-    <div className="h-[200px] w-full">
+    <div className="dark:bg-secondary h-[200px] w-full">
       <AnimatePresence mode="popLayout">
         {status === "success" ? (
           <motion.div
@@ -101,13 +101,13 @@ export function FeedbackForm({ authUserId, onClose }: FeedbackFormProps) {
             transition={TRANSITION_CONTENT}
           >
             <div className="rounded-full bg-green-500/10 p-1">
-              <SealCheck className="size-6 text-green-500" />
+              <BadgeCheck className="size-6 text-green-500" />
             </div>
             <p className="text-foreground mt-3 mb-1 text-center text-sm font-medium">
-              Thank you for your time!
+              Спасибо за ваше время!
             </p>
             <p className="text-muted-foreground text-sm">
-              Your feedback makes Zola better.
+              Ваш отзыв помогает сделать ЕМК чат лучше.
             </p>
           </motion.div>
         ) : (
@@ -133,7 +133,7 @@ export function FeedbackForm({ authUserId, onClose }: FeedbackFormProps) {
               }}
               className="text-muted-foreground pointer-events-none absolute top-3.5 left-4 text-sm leading-[1.4] select-none"
             >
-              What would make Zola better for you?
+              Что сделает ChatEMK лучше для вас?
             </motion.span>
             <textarea
               className="text-foreground h-full w-full resize-none rounded-md bg-transparent px-4 py-3.5 text-sm outline-hidden"
@@ -154,14 +154,14 @@ export function FeedbackForm({ authUserId, onClose }: FeedbackFormProps) {
                 disabled={status === "submitting"}
                 className="rounded-lg"
               >
-                <CaretLeft size={16} className="text-foreground" />
+                <ChevronLeft size={16} className="text-foreground" />
               </Button>
               <Button
                 type="submit"
                 variant="outline"
                 size="sm"
                 aria-label="Submit feedback"
-                className="rounded-lg"
+                className="rounded-lg bg-transparent"
                 disabled={status === "submitting" || !feedback.trim()}
               >
                 <AnimatePresence mode="popLayout">
@@ -174,8 +174,8 @@ export function FeedbackForm({ authUserId, onClose }: FeedbackFormProps) {
                       transition={TRANSITION_CONTENT}
                       className="inline-flex items-center gap-2"
                     >
-                      <Spinner className="size-4 animate-spin" />
-                      Sending...
+                      <Loader className="size-4 animate-spin" />
+                      Отправка...
                     </motion.span>
                   ) : (
                     <motion.span
@@ -185,7 +185,7 @@ export function FeedbackForm({ authUserId, onClose }: FeedbackFormProps) {
                       exit={{ opacity: 0, y: -10 }}
                       transition={TRANSITION_CONTENT}
                     >
-                      Send
+                      Отправить
                     </motion.span>
                   )}
                 </AnimatePresence>

@@ -9,7 +9,6 @@ export function InteractionPreferences() {
     setPromptSuggestions,
     setShowToolInvocations,
     setShowConversationPreviews,
-    setMultiModelEnabled,
   } = useUserPreferences()
 
   return (
@@ -18,14 +17,15 @@ export function InteractionPreferences() {
       <div>
         <div className="flex items-center justify-between">
           <div>
-            <h3 className="text-sm font-medium">Prompt suggestions</h3>
+            <h3 className="text-sm font-medium">Предложения промтов</h3>
             <p className="text-muted-foreground text-xs">
-              Show suggested prompts when starting a new conversation
+              Показывать готовые подсказки при начале нового диалога
             </p>
           </div>
           <Switch
             checked={preferences.promptSuggestions}
             onCheckedChange={setPromptSuggestions}
+            className="data-[state=checked]:!bg-blue-600 data-[state=unchecked]:!bg-gray-300 dark:data-[state=checked]:!bg-blue-600 dark:data-[state=unchecked]:!bg-gray-300 [&_[data-slot='switch-thumb']]:!bg-white"
           />
         </div>
       </div>
@@ -33,14 +33,15 @@ export function InteractionPreferences() {
       <div>
         <div className="flex items-center justify-between">
           <div>
-            <h3 className="text-sm font-medium">Tool invocations</h3>
+            <h3 className="text-sm font-medium">Вызовы инструментов</h3>
             <p className="text-muted-foreground text-xs">
-              Show tool execution details in conversations
+              Показывать детали выполнения инструментов в диалоге
             </p>
           </div>
           <Switch
             checked={preferences.showToolInvocations}
             onCheckedChange={setShowToolInvocations}
+            className="data-[state=checked]:!bg-blue-600 data-[state=unchecked]:!bg-gray-300 dark:data-[state=checked]:!bg-blue-600 dark:data-[state=unchecked]:!bg-gray-300 [&_[data-slot='switch-thumb']]:!bg-white"
           />
         </div>
       </div>
@@ -48,29 +49,15 @@ export function InteractionPreferences() {
       <div>
         <div className="flex items-center justify-between">
           <div>
-            <h3 className="text-sm font-medium">Conversation previews</h3>
+            <h3 className="text-sm font-medium">Предпросмотр диалогов</h3>
             <p className="text-muted-foreground text-xs">
-              Show conversation previews in history
+              Показывать предпросмотр диалогов в истории
             </p>
           </div>
           <Switch
             checked={preferences.showConversationPreviews}
             onCheckedChange={setShowConversationPreviews}
-          />
-        </div>
-      </div>
-      {/* Multi-Model Chat */}
-      <div>
-        <div className="flex items-center justify-between">
-          <div>
-            <h3 className="text-sm font-medium">Multi-model chat</h3>
-            <p className="text-muted-foreground text-xs">
-              Send prompts to multiple models at once
-            </p>
-          </div>
-          <Switch
-            checked={preferences.multiModelEnabled}
-            onCheckedChange={setMultiModelEnabled}
+            className="data-[state=checked]:!bg-blue-600 data-[state=unchecked]:!bg-gray-300 dark:data-[state=checked]:!bg-blue-600 dark:data-[state=unchecked]:!bg-gray-300 [&_[data-slot='switch-thumb']]:!bg-white"
           />
         </div>
       </div>

@@ -1,7 +1,7 @@
 "use client"
 
-import { FolderPlusIcon } from "@phosphor-icons/react"
 import { useQuery } from "@tanstack/react-query"
+import { FolderPlus } from "lucide-react"
 import { useState } from "react"
 import { DialogCreateProject } from "./dialog-create-project"
 import { SidebarProjectItem } from "./sidebar-project-item"
@@ -21,7 +21,7 @@ export function SidebarProject() {
     queryFn: async () => {
       const response = await fetch("/api/projects")
       if (!response.ok) {
-        throw new Error("Failed to fetch projects")
+        throw new Error("Не удалось загрузить проекты")
       }
       return response.json()
     },
@@ -35,8 +35,8 @@ export function SidebarProject() {
         onClick={() => setIsDialogOpen(true)}
       >
         <div className="flex items-center gap-2">
-          <FolderPlusIcon size={20} />
-          New project
+          <FolderPlus size={20} />
+          Новый проект
         </div>
       </button>
 

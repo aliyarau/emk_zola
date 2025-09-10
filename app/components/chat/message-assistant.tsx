@@ -7,7 +7,7 @@ import {
 import { useUserPreferences } from "@/lib/user-preference-store/provider"
 import { cn } from "@/lib/utils"
 import type { Message as MessageAISDK } from "@ai-sdk/react"
-import { ArrowClockwise, Check, Copy } from "@phosphor-icons/react"
+import { Check, Copy, RefreshCcw } from "lucide-react"
 import { useCallback, useRef } from "react"
 import { getSources } from "./get-sources"
 import { QuoteButton } from "./quote-button"
@@ -137,7 +137,7 @@ export function MessageAssistant({
             )}
           >
             <MessageAction
-              tooltip={copied ? "Copied!" : "Copy text"}
+              tooltip={copied ? "Копировать!" : "Копировать"}
               side="bottom"
             >
               <button
@@ -149,13 +149,16 @@ export function MessageAssistant({
                 {copied ? (
                   <Check className="size-4" />
                 ) : (
-                  <Copy className="size-4" />
+                  <Copy
+                    className="size-4"
+                    style={{ transform: "scaleX(-1)" }}
+                  />
                 )}
               </button>
             </MessageAction>
             {isLast ? (
               <MessageAction
-                tooltip="Regenerate"
+                tooltip="Попробовать еще раз"
                 side="bottom"
                 delayDuration={0}
               >
@@ -165,7 +168,7 @@ export function MessageAssistant({
                   onClick={onReload}
                   type="button"
                 >
-                  <ArrowClockwise className="size-4" />
+                  <RefreshCcw className="size-4" />
                 </button>
               </MessageAction>
             ) : null}

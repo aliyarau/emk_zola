@@ -6,7 +6,7 @@ import { useChats } from "@/lib/chat-store/chats/provider"
 import { useMessages } from "@/lib/chat-store/messages/provider"
 import { clearAllIndexedDBStores } from "@/lib/chat-store/persist"
 import { useUser } from "@/lib/user-store/provider"
-import { SignOut } from "@phosphor-icons/react"
+import { LogOut } from "lucide-react"
 import { useRouter } from "next/navigation"
 
 export function AccountManagement() {
@@ -31,17 +31,19 @@ export function AccountManagement() {
   return (
     <div className="flex items-center justify-between">
       <div>
-        <h3 className="text-sm font-medium">Account</h3>
-        <p className="text-muted-foreground text-xs">Log out on this device</p>
+        <h3 className="text-sm font-medium">Аккаунт</h3>
+        <p className="text-muted-foreground text-xs">
+          Выйти на этом устройстве
+        </p>
       </div>
       <Button
         variant="default"
         size="sm"
-        className="flex items-center gap-2"
+        className="flex items-center gap-2 rounded-xl"
         onClick={handleSignOut}
       >
-        <SignOut className="size-4" />
-        <span>Sign out</span>
+        <LogOut className="size-4" />
+        <span>Выйти</span>
       </Button>
     </div>
   )

@@ -26,22 +26,26 @@ export function DialogDeleteChat({
 }: DialogDeleteChatProps) {
   return (
     <AlertDialog open={isOpen} onOpenChange={setIsOpen}>
-      <AlertDialogContent>
+      <AlertDialogContent className="dark:bg-secondary">
         <AlertDialogHeader>
-          <AlertDialogTitle>Delete chat?</AlertDialogTitle>
+          <AlertDialogTitle>Удалить чат?</AlertDialogTitle>
           <AlertDialogDescription>
-            This will delete &quot;{chatTitle}&quot;
+            Это удалит{" "}
+            <span className="text-primary font-semibold">{chatTitle}</span>.
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel>Cancel</AlertDialogCancel>
+          <AlertDialogCancel className="border-secondary rounded-full border bg-transparent shadow-none focus-visible:ring-0">
+            Отменить
+          </AlertDialogCancel>
           <AlertDialogAction
             onClick={async () => {
               setIsOpen(false)
               await onConfirmDelete()
             }}
+            className="rounded-full focus-visible:ring-0"
           >
-            Delete
+            Удалить
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>

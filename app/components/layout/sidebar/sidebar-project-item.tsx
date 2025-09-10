@@ -4,8 +4,8 @@ import { useBreakpoint } from "@/app/hooks/use-breakpoint"
 import useClickOutside from "@/app/hooks/use-click-outside"
 import { fetchClient } from "@/lib/fetch"
 import { cn } from "@/lib/utils"
-import { Check, FolderIcon, X } from "@phosphor-icons/react"
 import { useMutation, useQueryClient } from "@tanstack/react-query"
+import { Check, Folder, X } from "lucide-react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { useCallback, useMemo, useRef, useState } from "react"
@@ -56,7 +56,7 @@ export function SidebarProjectItem({ project }: SidebarProjectItemProps) {
 
       if (!response.ok) {
         const error = await response.json()
-        throw new Error(error.error || "Failed to update project")
+        throw new Error(error.error || "Не удалось обновить проект")
       }
 
       return response.json()
@@ -206,7 +206,7 @@ export function SidebarProjectItem({ project }: SidebarProjectItemProps) {
   )
 
   const displayName = useMemo(
-    () => project.name || "Untitled Project",
+    () => project.name || "Безымянный проект",
     [project.name]
   )
 
@@ -236,7 +236,7 @@ export function SidebarProjectItem({ project }: SidebarProjectItemProps) {
     >
       {isEditing ? (
         <div className="bg-accent flex items-center rounded-md py-1 pr-1 pl-2">
-          <FolderIcon size={20} className="text-primary mr-2 flex-shrink-0" />
+          <Folder size={20} className="text-primary mr-2 flex-shrink-0" />
           <input
             ref={inputRef}
             value={editName}
@@ -251,14 +251,14 @@ export function SidebarProjectItem({ project }: SidebarProjectItemProps) {
               className="hover:bg-secondary text-muted-foreground hover:text-primary flex size-7 items-center justify-center rounded-md p-1 transition-colors duration-150"
               type="button"
             >
-              <Check size={16} weight="bold" />
+              <Check size={16} />
             </button>
             <button
               onClick={handleCancelClick}
               className="hover:bg-secondary text-muted-foreground hover:text-primary flex size-7 items-center justify-center rounded-md p-1 transition-colors duration-150"
               type="button"
             >
-              <X size={16} weight="bold" />
+              <X size={16} />
             </button>
           </div>
         </div>
@@ -274,7 +274,7 @@ export function SidebarProjectItem({ project }: SidebarProjectItemProps) {
               className="text-primary relative line-clamp-1 flex w-full items-center gap-2 mask-r-from-80% mask-r-to-85% px-2 py-2 text-sm text-ellipsis whitespace-nowrap"
               title={displayName}
             >
-              <FolderIcon size={20} />
+              <Folder size={20} />
               {displayName}
             </div>
           </Link>

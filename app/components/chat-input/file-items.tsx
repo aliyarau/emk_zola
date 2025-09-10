@@ -10,7 +10,7 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip"
-import { X } from "@phosphor-icons/react"
+import { X } from "lucide-react"
 import Image from "next/image"
 import { useState } from "react"
 
@@ -35,7 +35,7 @@ export function FileItem({ file, onRemove }: FileItemProps) {
         onOpenChange={setIsOpen}
       >
         <HoverCardTrigger className="w-full">
-          <div className="bg-background hover:bg-accent border-input flex w-full items-center gap-3 rounded-2xl border p-2 pr-3 transition-colors">
+          <div className="bg-background hover:bg-accent border-secondary flex w-full items-center gap-3 rounded-2xl border-1 p-2 pr-3 transition-colors">
             <div className="bg-accent-foreground flex h-10 w-10 flex-shrink-0 items-center justify-center overflow-hidden rounded-md">
               {file.type.includes("image") ? (
                 <Image
@@ -75,13 +75,13 @@ export function FileItem({ file, onRemove }: FileItemProps) {
             <button
               type="button"
               onClick={handleRemove}
-              className="border-background absolute top-1 right-1 z-10 inline-flex size-6 translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full border-[3px] bg-black text-white shadow-none transition-colors"
+              className="border-background absolute top-1 right-1 z-10 inline-flex size-6 translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full border-1 bg-black text-white shadow-none transition-colors"
               aria-label="Remove file"
             >
               <X className="size-3" />
             </button>
           </TooltipTrigger>
-          <TooltipContent>Remove file</TooltipContent>
+          <TooltipContent>Удалить файл</TooltipContent>
         </Tooltip>
       ) : null}
     </div>

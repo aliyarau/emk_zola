@@ -6,7 +6,7 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip"
-import { NotePencilIcon } from "@phosphor-icons/react/dist/ssr"
+import { SquarePen } from "lucide-react"
 import Link from "next/link"
 import { usePathname, useRouter } from "next/navigation"
 
@@ -27,12 +27,12 @@ export function ButtonNewChat() {
           href="/"
           className="text-muted-foreground hover:text-foreground hover:bg-muted bg-background rounded-full p-1.5 transition-colors"
           prefetch
-          aria-label="New Chat"
+          aria-label="Новый чат"
         >
-          <NotePencilIcon size={24} />
+          <SquarePen size={24} />
         </Link>
       </TooltipTrigger>
-      <TooltipContent>New Chat ⌘⇧U</TooltipContent>
+      <TooltipContent>Новый чат ⌘⇧U</TooltipContent>
     </Tooltip>
   )
 }

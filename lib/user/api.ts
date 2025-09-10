@@ -22,10 +22,9 @@ export async function getUserProfile(): Promise<UserProfile | null> {
     // return fake user profile for no supabase
     return {
       id: "guest",
-      email: "guest@zola.chat",
+      email: "guest@emk.chat",
       display_name: "Guest",
       profile_image: "",
-      anonymous: true,
       preferences: defaultPreferences,
     } as UserProfile
   }
@@ -38,9 +37,6 @@ export async function getUserProfile(): Promise<UserProfile | null> {
     .select("*, user_preferences(*)")
     .eq("id", user.id)
     .single()
-
-  // Don't load anonymous users in the user store
-  if (userProfileData?.anonymous) return null
 
   // Format user preferences if they exist
   const formattedPreferences = userProfileData?.user_preferences

@@ -3,7 +3,7 @@ import useClickOutside from "@/app/hooks/use-click-outside"
 import { useChats } from "@/lib/chat-store/chats/provider"
 import { Chat } from "@/lib/chat-store/types"
 import { cn } from "@/lib/utils"
-import { Check, X } from "@phosphor-icons/react"
+import { Check, X } from "lucide-react"
 import Link from "next/link"
 import { useCallback, useMemo, useRef, useState } from "react"
 import { SidebarItemMenu } from "./sidebar-item-menu"
@@ -119,10 +119,7 @@ export function SidebarItem({ chat, currentChatId }: SidebarItemProps) {
     [chat.id, currentChatId, isEditing, isMenuOpen]
   )
 
-  const displayTitle = useMemo(
-    () => chat.title || "Untitled Chat",
-    [chat.title]
-  )
+  const displayTitle = useMemo(() => chat.title || "Без названия", [chat.title])
 
   const containerClassName = useMemo(
     () =>
@@ -164,14 +161,14 @@ export function SidebarItem({ chat, currentChatId }: SidebarItemProps) {
               className="hover:bg-secondary text-muted-foreground hover:text-primary flex size-7 items-center justify-center rounded-md p-1 transition-colors duration-150"
               type="button"
             >
-              <Check size={16} weight="bold" />
+              <Check size={16} />
             </button>
             <button
               onClick={handleCancelClick}
               className="hover:bg-secondary text-muted-foreground hover:text-primary flex size-7 items-center justify-center rounded-md p-1 transition-colors duration-150"
               type="button"
             >
-              <X size={16} weight="bold" />
+              <X size={16} />
             </button>
           </div>
         </div>

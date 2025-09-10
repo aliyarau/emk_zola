@@ -1,13 +1,13 @@
 "use client"
 
 import { useBreakpoint } from "@/app/hooks/use-breakpoint"
-import { useUser } from "@/lib/user-store/provider"
 import { FeedbackForm } from "@/components/common/feedback-form"
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog"
 import { Drawer, DrawerContent, DrawerTrigger } from "@/components/ui/drawer"
 import { DropdownMenuItem } from "@/components/ui/dropdown-menu"
 import { isSupabaseEnabled } from "@/lib/supabase/config"
-import { Question } from "@phosphor-icons/react"
+import { useUser } from "@/lib/user-store/provider"
+import { MessageSquarePlus } from "lucide-react"
 import { useState } from "react"
 
 export function FeedbackTrigger() {
@@ -25,8 +25,8 @@ export function FeedbackTrigger() {
 
   const trigger = (
     <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
-      <Question className="size-4" />
-      <span>Feedback</span>
+      <MessageSquarePlus className="size-4" />
+      <span>Оставить отзыв</span>
     </DropdownMenuItem>
   )
 

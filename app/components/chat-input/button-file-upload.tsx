@@ -17,7 +17,7 @@ import {
 import { getModelInfo } from "@/lib/models"
 import { isSupabaseEnabled } from "@/lib/supabase/config"
 import { cn } from "@/lib/utils"
-import { FileArrowUp, Paperclip } from "@phosphor-icons/react"
+import { FileUp, Paperclip } from "lucide-react"
 import React from "react"
 import { PopoverContentAuth } from "./popover-content-auth"
 
@@ -47,7 +47,7 @@ export function ButtonFileUpload({
               <Button
                 size="sm"
                 variant="secondary"
-                className="border-border dark:bg-secondary size-9 rounded-full border bg-transparent"
+                className="hover:bg-accent size-9 rounded-full border-0 bg-transparent shadow-none"
                 type="button"
                 aria-label="Add files"
               >
@@ -55,13 +55,13 @@ export function ButtonFileUpload({
               </Button>
             </PopoverTrigger>
           </TooltipTrigger>
-          <TooltipContent>Add files</TooltipContent>
+          <TooltipContent>Добавить фотографии и файлы</TooltipContent>
         </Tooltip>
         <PopoverContent className="p-2">
           <div className="text-secondary-foreground text-sm">
-            This model does not support file uploads.
+            Эта модель не поддерживает загрузку файлов.
             <br />
-            Please select another model.
+            Пожалуйста, выберите другую модель.
           </div>
         </PopoverContent>
       </Popover>
@@ -77,7 +77,7 @@ export function ButtonFileUpload({
               <Button
                 size="sm"
                 variant="secondary"
-                className="border-border dark:bg-secondary size-9 rounded-full border bg-transparent"
+                className="hover:bg-accent size-9 rounded-full border-0 bg-transparent shadow-none"
                 type="button"
                 aria-label="Add files"
               >
@@ -85,7 +85,7 @@ export function ButtonFileUpload({
               </Button>
             </PopoverTrigger>
           </TooltipTrigger>
-          <TooltipContent>Add files</TooltipContent>
+          <TooltipContent>Добавить фотографии и файлы</TooltipContent>
         </Tooltip>
         <PopoverContentAuth />
       </Popover>
@@ -97,7 +97,40 @@ export function ButtonFileUpload({
       onFilesAdded={onFileUpload}
       multiple
       disabled={!isUserAuthenticated}
-      accept=".txt,.md,image/jpeg,image/png,image/gif,image/webp,image/svg,image/heic,image/heif"
+      accept={[
+        // изображения
+        "image/jpeg",
+        "image/png",
+        "image/gif",
+        "image/webp",
+        "image/svg+xml",
+        ".jpg",
+        ".jpeg",
+        ".png",
+        ".gif",
+        ".webp",
+        ".svg",
+
+        // документы/текст
+        "application/pdf",
+        "text/plain",
+        "text/markdown",
+        "application/json",
+        "text/csv",
+        "application/vnd.ms-excel",
+        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        ".pdf",
+        ".txt",
+        ".md",
+        ".json",
+        ".csv",
+        ".xls",
+        ".xlsx",
+
+        // если реально нужны фото с iPhone
+        // (добавляй только если добавишь их в серверную валидацию)
+        // "image/heic","image/heif",
+      ].join(",")}
     >
       <Tooltip>
         <TooltipTrigger asChild>
@@ -106,7 +139,7 @@ export function ButtonFileUpload({
               size="sm"
               variant="secondary"
               className={cn(
-                "border-border dark:bg-secondary size-9 rounded-full border bg-transparent",
+                "hover:bg-accent size-9 rounded-full border-0 bg-transparent shadow-none",
                 !isUserAuthenticated && "opacity-50"
               )}
               type="button"
@@ -117,14 +150,16 @@ export function ButtonFileUpload({
             </Button>
           </FileUploadTrigger>
         </TooltipTrigger>
-        <TooltipContent>Add files</TooltipContent>
+        <TooltipContent>Добавить фотографии и файлы</TooltipContent>
       </Tooltip>
       <FileUploadContent>
         <div className="border-input bg-background flex flex-col items-center rounded-lg border border-dashed p-8">
-          <FileArrowUp className="text-muted-foreground size-8" />
-          <span className="mt-4 mb-1 text-lg font-medium">Drop files here</span>
+          <FileUp className="text-muted-foreground size-8" />
+          <span className="mt-4 mb-1 text-lg font-medium">
+            Добавить что-нибудь
+          </span>
           <span className="text-muted-foreground text-sm">
-            Drop any files here to add it to the conversation
+            Перетащите сюда любой файл, чтобы добавить его в обсуждение
           </span>
         </div>
       </FileUploadContent>

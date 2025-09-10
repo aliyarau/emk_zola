@@ -14,7 +14,6 @@ export async function POST(request: Request) {
 
     // If Supabase is not available, we still return success
     if (!supabase) {
-      console.log("Supabase not enabled, skipping DB update")
       return new Response(JSON.stringify({ success: true }), { status: 200 })
     }
 
@@ -40,7 +39,9 @@ export async function POST(request: Request) {
   } catch (err: unknown) {
     console.error("Error in update-chat-model endpoint:", err)
     return new Response(
-      JSON.stringify({ error: (err as Error).message || "Internal server error" }),
+      JSON.stringify({
+        error: (err as Error).message || "Internal server error",
+      }),
       { status: 500 }
     )
   }

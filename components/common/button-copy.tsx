@@ -1,5 +1,6 @@
 "use client"
 
+import { Check, Copy } from "lucide-react"
 import React, { useState } from "react"
 import { TextMorph } from "../motion-primitives/text-morph"
 
@@ -23,9 +24,16 @@ export function ButtonCopy({ code }: ButtonCopyProps) {
     <button
       onClick={onCopy}
       type="button"
-      className="text-muted-foreground hover:bg-muted inline-flex items-center justify-center gap-1.5 rounded-md px-2 py-1 text-xs"
+      className="text-muted-foreground dark:text-primary hover:bg-muted inline-flex items-center justify-center gap-1.5 rounded-md px-2 py-1 text-xs"
     >
-      <TextMorph as="span">{hasCopyLabel ? "Copied" : "Copy"}</TextMorph>
+      {hasCopyLabel ? (
+        <Check className="size-3" />
+      ) : (
+        <Copy className="size-3" style={{ transform: "scaleX(-1)" }} />
+      )}
+      <TextMorph as="span">
+        {hasCopyLabel ? "Скопировано" : "Копировать код"}
+      </TextMorph>
     </button>
   )
 }

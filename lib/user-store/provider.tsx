@@ -8,7 +8,13 @@ import {
   updateUserProfile,
 } from "@/lib/user-store/api"
 import type { UserProfile } from "@/lib/user/types"
-import { createContext, useContext, useEffect, useState } from "react"
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useState,
+} from "react"
 
 type UserContextType = {
   user: UserProfile | null
@@ -30,9 +36,8 @@ export function UserProvider({
   const [user, setUser] = useState<UserProfile | null>(initialUser)
   const [isLoading, setIsLoading] = useState(false)
 
-  const refreshUser = async () => {
+  const refreshUser = useCallback(async () => {
     if (!user?.id) return
-
     setIsLoading(true)
     try {
       const updatedUser = await fetchUserProfile(user.id)
@@ -40,7 +45,7 @@ export function UserProvider({
     } finally {
       setIsLoading(false)
     }
-  }
+  }, [user?.id])
 
   const updateUser = async (updates: Partial<UserProfile>) => {
     if (!user?.id) return
@@ -66,7 +71,6 @@ export function UserProvider({
     }
   }
 
-  // Set up realtime subscription for user data changes
   useEffect(() => {
     if (!user?.id) return
 
@@ -79,6 +83,12 @@ export function UserProvider({
     }
   }, [user?.id])
 
+  useEffect(() => {
+    if (user?.id && (!user.display_name || user.display_name === "")) {
+      refreshUser()
+    }
+  }, [user?.id, user?.display_name, refreshUser])
+
   return (
     <UserContext.Provider
       value={{ user, isLoading, updateUser, refreshUser, signOut }}
@@ -88,7 +98,6 @@ export function UserProvider({
   )
 }
 
-// Custom hook to use the user context
 export function useUser() {
   const context = useContext(UserContext)
   if (context === undefined) {

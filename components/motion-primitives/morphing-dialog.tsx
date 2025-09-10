@@ -1,7 +1,7 @@
 "use client"
 
 import { cn } from "@/lib/utils"
-import { X } from "@phosphor-icons/react"
+import { X } from "lucide-react"
 import {
   AnimatePresence,
   motion,
@@ -9,6 +9,8 @@ import {
   Transition,
   Variant,
 } from "motion/react"
+import Image from "next/image" // ⬅️ добавлено
+
 import React, {
   useCallback,
   useContext,
@@ -25,7 +27,7 @@ export type MorphingDialogContextType = {
   isOpen: boolean
   setIsOpen: React.Dispatch<React.SetStateAction<boolean>>
   uniqueId: string
-  triggerRef: React.RefObject<HTMLDivElement>
+  triggerRef: React.RefObject<HTMLButtonElement> // ⬅️ был HTMLDivElement
 }
 
 const MorphingDialogContext =
@@ -33,11 +35,10 @@ const MorphingDialogContext =
 
 function useMorphingDialog() {
   const context = useContext(MorphingDialogContext)
-  if (!context) {
+  if (!context)
     throw new Error(
       "useMorphingDialog must be used within a MorphingDialogProvider"
     )
-  }
   return context
 }
 
@@ -52,15 +53,10 @@ function MorphingDialogProvider({
 }: MorphingDialogProviderProps) {
   const [isOpen, setIsOpen] = useState(false)
   const uniqueId = useId()
-  const triggerRef = useRef<HTMLDivElement>(null!)
+  const triggerRef = useRef<HTMLButtonElement>(null!) // ⬅️ тип кнопки
 
   const contextValue = useMemo(
-    () => ({
-      isOpen,
-      setIsOpen,
-      uniqueId,
-      triggerRef,
-    }),
+    () => ({ isOpen, setIsOpen, uniqueId, triggerRef }),
     [isOpen, uniqueId]
   )
 
@@ -77,9 +73,10 @@ export type MorphingDialogProps = {
 }
 
 function MorphingDialog({ children, transition }: MorphingDialogProps) {
+  // ⬅️ пробрасываем transition в провайдер и убираем лишний MotionConfig-обёртку
   return (
-    <MorphingDialogProvider>
-      <MotionConfig transition={transition}>{children}</MotionConfig>
+    <MorphingDialogProvider transition={transition}>
+      {children}
     </MorphingDialogProvider>
   )
 }
@@ -88,20 +85,16 @@ export type MorphingDialogTriggerProps = {
   children: React.ReactNode
   className?: string
   style?: React.CSSProperties
-  triggerRef?: React.RefObject<HTMLButtonElement>
 }
 
 function MorphingDialogTrigger({
   children,
   className,
   style,
-  triggerRef,
 }: MorphingDialogTriggerProps) {
-  const { setIsOpen, isOpen, uniqueId } = useMorphingDialog()
+  const { setIsOpen, isOpen, uniqueId, triggerRef } = useMorphingDialog() // ⬅️ берём ref из контекста
 
-  const handleClick = useCallback(() => {
-    setIsOpen(!isOpen)
-  }, [isOpen, setIsOpen])
+  const handleClick = useCallback(() => setIsOpen(!isOpen), [isOpen, setIsOpen])
 
   const handleKeyDown = useCallback(
     (event: React.KeyboardEvent) => {
@@ -115,7 +108,7 @@ function MorphingDialogTrigger({
 
   return (
     <motion.button
-      ref={triggerRef}
+      ref={triggerRef} // ⬅️ используем контекстный ref
       layoutId={`dialog-${uniqueId}`}
       className={cn("relative", className)}
       onClick={handleClick}
@@ -151,12 +144,9 @@ function MorphingDialogContent({
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key === "Escape") {
-        setIsOpen(false)
-      }
+      if (event.key === "Escape") setIsOpen(false)
       if (event.key === "Tab") {
         if (!firstFocusableElement || !lastFocusableElement) return
-
         if (event.shiftKey) {
           if (document.activeElement === firstFocusableElement) {
             event.preventDefault()
@@ -170,12 +160,8 @@ function MorphingDialogContent({
         }
       }
     }
-
     document.addEventListener("keydown", handleKeyDown)
-
-    return () => {
-      document.removeEventListener("keydown", handleKeyDown)
-    }
+    return () => document.removeEventListener("keydown", handleKeyDown)
   }, [setIsOpen, firstFocusableElement, lastFocusableElement])
 
   useEffect(() => {
@@ -198,9 +184,7 @@ function MorphingDialogContent({
   }, [isOpen, triggerRef])
 
   useClickOutside(containerRef, () => {
-    if (isOpen) {
-      setIsOpen(false)
-    }
+    if (isOpen) setIsOpen(false)
   })
 
   return (
@@ -269,7 +253,6 @@ function MorphingDialogTitle({
   style,
 }: MorphingDialogTitleProps) {
   const { uniqueId } = useMorphingDialog()
-
   return (
     <motion.div
       layoutId={`dialog-title-container-${uniqueId}`}
@@ -294,7 +277,6 @@ function MorphingDialogSubtitle({
   style,
 }: MorphingDialogSubtitleProps) {
   const { uniqueId } = useMorphingDialog()
-
   return (
     <motion.div
       layoutId={`dialog-subtitle-container-${uniqueId}`}
@@ -324,7 +306,6 @@ function MorphingDialogDescription({
   disableLayoutAnimation,
 }: MorphingDialogDescriptionProps) {
   const { uniqueId } = useMorphingDialog()
-
   return (
     <motion.div
       key={`dialog-description-${uniqueId}`}
@@ -350,6 +331,7 @@ export type MorphingDialogImageProps = {
   alt: string
   className?: string
   style?: React.CSSProperties
+  sizes?: string
 }
 
 function MorphingDialogImage({
@@ -357,17 +339,34 @@ function MorphingDialogImage({
   alt,
   className,
   style,
+  sizes = "90vw",
 }: MorphingDialogImageProps) {
   const { uniqueId } = useMorphingDialog()
-
+  if (src.startsWith("blob:") || src.startsWith("data:")) {
+    return (
+      <motion.img
+        src={src}
+        alt={alt}
+        className={cn(className)}
+        layoutId={`dialog-img-${uniqueId}`}
+        style={style}
+      />
+    )
+  }
   return (
-    <motion.img
-      src={src}
-      alt={alt}
-      className={cn(className)}
+    <motion.div
       layoutId={`dialog-img-${uniqueId}`}
+      className={cn("relative", className)}
       style={style}
-    />
+    >
+      <Image
+        src={src}
+        alt={alt || ""}
+        fill
+        sizes={sizes}
+        className="object-contain"
+      />
+    </motion.div>
   )
 }
 
@@ -387,10 +386,7 @@ function MorphingDialogClose({
   variants,
 }: MorphingDialogCloseProps) {
   const { setIsOpen, uniqueId } = useMorphingDialog()
-
-  const handleClose = useCallback(() => {
-    setIsOpen(false)
-  }, [setIsOpen])
+  const handleClose = useCallback(() => setIsOpen(false), [setIsOpen])
 
   return (
     <motion.button
@@ -398,7 +394,7 @@ function MorphingDialogClose({
       type="button"
       aria-label="Close dialog"
       key={`dialog-close-${uniqueId}`}
-      className={cn("fixed top-6 right-6", className)}
+      className={cn("absolute top-6 right-6", className)}
       initial="initial"
       animate="animate"
       exit="exit"

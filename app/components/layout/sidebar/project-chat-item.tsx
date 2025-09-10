@@ -5,7 +5,7 @@ import useClickOutside from "@/app/hooks/use-click-outside"
 import { useChats } from "@/lib/chat-store/chats/provider"
 import { Chat } from "@/lib/chat-store/types"
 import { cn } from "@/lib/utils"
-import { ChatCircleIcon, Check, X } from "@phosphor-icons/react"
+import { Check, MessageCircle, X } from "lucide-react"
 import Link from "next/link"
 import { useCallback, useMemo, useRef, useState } from "react"
 import { SidebarItemMenu } from "./sidebar-item-menu"
@@ -116,10 +116,7 @@ export function ProjectChatItem({ chat, formatDate }: ProjectChatItemProps) {
   }, [])
 
   // Memoize computed values
-  const displayTitle = useMemo(
-    () => chat.title || "Untitled Chat",
-    [chat.title]
-  )
+  const displayTitle = useMemo(() => chat.title || "Без названия", [chat.title])
 
   const containerClassName = useMemo(
     () =>
@@ -147,7 +144,7 @@ export function ProjectChatItem({ chat, formatDate }: ProjectChatItemProps) {
         ref={containerRef}
       >
         <div className="flex items-center p-3">
-          <ChatCircleIcon
+          <MessageCircle
             size={16}
             className="text-muted-foreground mr-3 flex-shrink-0"
           />
@@ -165,14 +162,14 @@ export function ProjectChatItem({ chat, formatDate }: ProjectChatItemProps) {
               className="hover:bg-secondary text-muted-foreground hover:text-primary flex size-6 items-center justify-center rounded-md p-1 transition-colors duration-150"
               type="button"
             >
-              <Check size={12} weight="bold" />
+              <Check size={12} />
             </button>
             <button
               onClick={handleCancelClick}
               className="hover:bg-secondary text-muted-foreground hover:text-primary flex size-6 items-center justify-center rounded-md p-1 transition-colors duration-150"
               type="button"
             >
-              <X size={12} weight="bold" />
+              <X size={12} />
             </button>
           </div>
         </div>

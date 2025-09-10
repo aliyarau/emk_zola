@@ -17,18 +17,65 @@ import {
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
 import { Message as MessageType } from "@ai-sdk/react"
-import { Check, Copy, Trash } from "@phosphor-icons/react"
+import { Check, Copy, Pencil } from "lucide-react"
 import Image from "next/image"
-import { useRef, useState } from "react"
+import React, { useRef, useState } from "react"
 
-const getTextFromDataUrl = (dataUrl: string) => {
-  const base64 = dataUrl.split(",")[1]
-  return base64
+/* ------------ простая «фишка» для документов (как в инпуте) ------------ */
+
+function extFromNameOrType(name?: string, type?: string) {
+  const m = name?.match(/\.(\w+)$/)
+  if (m?.[1]) return m[1].toUpperCase()
+  if (type?.includes("/")) return type.split("/")[1]?.toUpperCase()
+  return ""
 }
+
+function formatKB(bytes?: number) {
+  if (!bytes || bytes <= 0) return ""
+  const kb = bytes / 1024
+  return `${kb.toFixed(2)}kB`
+}
+
+// Чип без действий/кнопок — только внешний вид как в FileItem
+function DocChip({
+  url,
+  name,
+  contentType,
+  size,
+}: {
+  url: string
+  name?: string
+  contentType?: string
+  size?: number
+}) {
+  return (
+    <a
+      href={url}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="bg-secondary hover:bg-accent border-input flex w-48 items-center gap-3 rounded-2xl border-0 p-2 pr-3 transition-colors"
+      title={name}
+    >
+      <div className="bg-accent-foreground flex h-10 w-10 flex-shrink-0 items-center justify-center overflow-hidden rounded-md">
+        <div className="text-center text-xs text-gray-400">
+          {extFromNameOrType(name, contentType)}
+        </div>
+      </div>
+      <div className="flex flex-col overflow-hidden">
+        <span className="truncate text-xs font-medium">{name || "Файл"}</span>
+        {size ? (
+          <span className="text-xs text-gray-500">{formatKB(size)}</span>
+        ) : null}
+      </div>
+    </a>
+  )
+}
+
+/* -------------------------- компонент сообщения -------------------------- */
 
 export type MessageUserProps = {
   hasScrollAnchor?: boolean
-  attachments?: MessageType["experimental_attachments"]
+  attachments?: MessageType["experimental_attachments"] // { name?, url, contentType?, ... }
   children: string
   copied: boolean
   copyToClipboard: () => void
@@ -47,7 +94,6 @@ export function MessageUser({
   copyToClipboard,
   onEdit,
   onReload,
-  onDelete,
   id,
   className,
 }: MessageUserProps) {
@@ -61,15 +107,9 @@ export function MessageUser({
   }
 
   const handleSave = () => {
-    if (onEdit) {
-      onEdit(id, editInput)
-    }
+    onEdit?.(id, editInput)
     onReload()
     setIsEditing(false)
-  }
-
-  const handleDelete = () => {
-    onDelete(id)
   }
 
   return (
@@ -80,12 +120,14 @@ export function MessageUser({
         className
       )}
     >
+      {/* Вложения */}
       {attachments?.map((attachment, index) => (
         <div
           className="flex flex-row gap-2"
-          key={`${attachment.name}-${index}`}
+          key={`${attachment.name ?? "file"}-${index}`}
         >
-          {attachment.contentType?.startsWith("image") ? (
+          {attachment.contentType?.startsWith("image/") ? (
+            /* --- изображения: превью + модалка --- */
             <MorphingDialog
               transition={{
                 type: "spring",
@@ -97,38 +139,43 @@ export function MessageUser({
               <MorphingDialogTrigger className="z-10">
                 <Image
                   className="mb-1 w-40 rounded-md"
-                  key={attachment.name}
                   src={attachment.url}
                   alt={attachment.name || "Attachment"}
                   width={160}
                   height={120}
                 />
               </MorphingDialogTrigger>
+
               <MorphingDialogContainer>
                 <MorphingDialogContent className="relative rounded-lg">
                   <MorphingDialogImage
                     src={attachment.url}
                     alt={attachment.name || ""}
-                    className="max-h-[90vh] max-w-[90vw] object-contain"
+                    className="relative h-[85vh] w-[90vw] max-w-[1200px]"
                   />
+                  <MorphingDialogClose className="text-primary" />
                 </MorphingDialogContent>
-                <MorphingDialogClose className="text-primary" />
               </MorphingDialogContainer>
             </MorphingDialog>
-          ) : attachment.contentType?.startsWith("text") ? (
-            <div className="text-primary mb-3 h-24 w-40 overflow-hidden rounded-md border p-2 text-xs">
-              {getTextFromDataUrl(attachment.url)}
-            </div>
-          ) : null}
+          ) : (
+            /* --- документы и прочее: чип как в инпуте --- */
+            <DocChip
+              url={attachment.url}
+              name={attachment.name}
+              contentType={attachment.contentType}
+              size={
+                "size" in attachment && typeof attachment.size === "number"
+                  ? attachment.size
+                  : undefined
+              }
+            />
+          )}
         </div>
       ))}
+
+      {/* Текст сообщения / редактирование */}
       {isEditing ? (
-        <div
-          className="bg-accent relative flex min-w-[180px] flex-col gap-2 rounded-3xl px-5 py-2.5"
-          style={{
-            width: contentRef.current?.offsetWidth,
-          }}
-        >
+        <div className="bg-accent w/full relative flex max-w-none flex-col gap-2 self-stretch rounded-3xl px-5 py-2.5">
           <textarea
             className="w-full resize-none bg-transparent outline-none"
             value={editInput}
@@ -145,18 +192,23 @@ export function MessageUser({
             autoFocus
           />
           <div className="flex justify-end gap-2">
-            <Button size="sm" variant="ghost" onClick={handleEditCancel}>
-              Cancel
+            <Button
+              size="sm"
+              variant="secondary"
+              onClick={handleEditCancel}
+              className="bg-primary-foreground rounded-full"
+            >
+              Отменить
             </Button>
-            <Button size="sm" onClick={handleSave}>
-              Save
+            <Button size="sm" onClick={handleSave} className="rounded-full">
+              Отправить
             </Button>
           </div>
         </div>
       ) : (
         <MessageContent
           className="bg-accent prose dark:prose-invert relative max-w-[70%] rounded-3xl px-5 py-2.5"
-          markdown={true}
+          markdown
           ref={contentRef}
           components={{
             code: ({ children }) => <>{children}</>,
@@ -176,46 +228,48 @@ export function MessageUser({
           {children}
         </MessageContent>
       )}
+
+      {/* Действия */}
       <MessageActions className="flex gap-0 opacity-0 transition-opacity duration-0 group-hover:opacity-100">
-        <MessageAction tooltip={copied ? "Copied!" : "Copy text"} side="bottom">
-          <button
-            className="hover:bg-accent/60 text-muted-foreground hover:text-foreground flex size-7.5 items-center justify-center rounded-full bg-transparent transition"
-            aria-label="Copy text"
-            onClick={copyToClipboard}
-            type="button"
-          >
-            {copied ? (
-              <Check className="size-4" />
-            ) : (
-              <Copy className="size-4" />
-            )}
-          </button>
-        </MessageAction>
-        {/* @todo: add when ready */}
-        {/* <MessageAction
-          tooltip={isEditing ? "Save" : "Edit"}
-          side="bottom"
-          delayDuration={0}
-        >
-          <button
-            className="flex h-8 w-8 items-center justify-center rounded-full bg-transparent transition"
-            aria-label="Edit"
-            onClick={() => setIsEditing(!isEditing)}
-            type="button"
-          >
-            <PencilSimple className="size-4" />
-          </button>
-        </MessageAction> */}
-        <MessageAction tooltip="Delete" side="bottom">
-          <button
-            className="hover:bg-accent/60 text-muted-foreground hover:text-foreground flex size-7.5 items-center justify-center rounded-full bg-transparent transition"
-            aria-label="Delete"
-            onClick={handleDelete}
-            type="button"
-          >
-            <Trash className="size-4" />
-          </button>
-        </MessageAction>
+        {!isEditing && (
+          <>
+            <MessageAction
+              tooltip={copied ? "Скопировано!" : "Копировать"}
+              side="bottom"
+            >
+              <button
+                className="hover:bg-accent/60 text-muted-foreground hover:text-foreground flex size-7.5 items-center justify-center rounded-full bg-transparent transition"
+                aria-label="Copy text"
+                onClick={copyToClipboard}
+                type="button"
+              >
+                {copied ? (
+                  <Check className="size-4" />
+                ) : (
+                  <Copy
+                    className="size-4"
+                    style={{ transform: "scaleX(-1)" }}
+                  />
+                )}
+              </button>
+            </MessageAction>
+
+            <MessageAction
+              tooltip="Редактировать сообщение"
+              side="bottom"
+              delayDuration={0}
+            >
+              <button
+                className="hover:bg-accent/60 text-muted-foreground hover:text-foreground flex size-7.5 items-center justify-center rounded-full bg-transparent transition"
+                aria-label="Edit"
+                onClick={() => setIsEditing(true)}
+                type="button"
+              >
+                <Pencil className="size-4" />
+              </button>
+            </MessageAction>
+          </>
+        )}
       </MessageActions>
     </MessageContainer>
   )

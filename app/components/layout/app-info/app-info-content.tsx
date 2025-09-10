@@ -1,26 +1,20 @@
 export function AppInfoContent() {
   return (
-    <div className="space-y-4">
+    <div className="space-y-3">
       <p className="text-foreground leading-relaxed">
-        <span className="font-medium">Zola</span> is the open-source interface
-        for AI chat.
-        <br />
-        Multi-model, BYOK-ready, and fully self-hostable.
-        <br />
-        Use Claude, OpenAI, Gemini, local models, and more, all in one place.
-        <br />
+        <span className="font-medium">ChatEMK</span> — корпоративный
+        AI-ассистент для нашей компании и сотрудников.
       </p>
       <p className="text-foreground leading-relaxed">
-        The code is available on{" "}
-        <a
-          href="https://github.com/ibelick/zola"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="underline"
-        >
-          GitHub
-        </a>
-        .
+        Он понимает специфику работы, знает внутренние процессы и помогает
+        находить решения быстрее.
+      </p>
+      <p className="text-foreground leading-relaxed">
+        Каждый день <span className="font-medium">ChatEMK</span> становится
+        умнее: учится на задачах и адаптируется под команду.
+      </p>
+      <p className="text-foreground leading-relaxed">
+        Делитесь пожеланиями и отзывами — вместе мы сделаем его ещё полезнее.
       </p>
     </div>
   )

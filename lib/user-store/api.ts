@@ -20,9 +20,6 @@ export async function fetchUserProfile(
     return null
   }
 
-  // Don't return anonymous users
-  if (data.anonymous) return null
-
   return {
     ...data,
     profile_image: data.profile_image || "",
@@ -38,12 +35,10 @@ export async function updateUserProfile(
   if (!supabase) return false
 
   const { error } = await supabase.from("users").update(updates).eq("id", id)
-
   if (error) {
     console.error("Failed to update user:", error)
     return false
   }
-
   return true
 }
 
@@ -56,40 +51,24 @@ export async function signOutUser(): Promise<boolean> {
     })
     return false
   }
-
   const { error } = await supabase.auth.signOut()
   if (error) {
     console.error("Failed to sign out:", error)
     return false
   }
-
   return true
 }
 
+/**
+ * В корпоративной версии Realtime не используем.
+ * Никаких WebSocket — просто no-op.
+ */
 export function subscribeToUserUpdates(
-  userId: string,
-  onUpdate: (newData: Partial<UserProfile>) => void
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  _userId: string,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  _onUpdate: (newData: Partial<UserProfile>) => void
 ) {
-  const supabase = createClient()
-  if (!supabase) return () => {}
-
-  const channel = supabase
-    .channel(`public:users:id=eq.${userId}`)
-    .on(
-      "postgres_changes",
-      {
-        event: "UPDATE",
-        schema: "public",
-        table: "users",
-        filter: `id=eq.${userId}`,
-      },
-      (payload) => {
-        onUpdate(payload.new as Partial<UserProfile>)
-      }
-    )
-    .subscribe()
-
-  return () => {
-    supabase.removeChannel(channel)
-  }
+  // ничего не делаем
+  return () => {}
 }

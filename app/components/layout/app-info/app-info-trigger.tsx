@@ -19,7 +19,7 @@ import {
 } from "@/components/ui/drawer"
 import { DropdownMenuItem } from "@/components/ui/dropdown-menu"
 import { APP_NAME } from "@/lib/config"
-import { Info } from "@phosphor-icons/react"
+import { Info } from "lucide-react"
 import Image from "next/image"
 import { AppInfoContent } from "./app-info-content"
 
@@ -33,7 +33,7 @@ export function AppInfoTrigger({ trigger }: AppInfoTriggerProps) {
   const defaultTrigger = (
     <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
       <Info className="size-4" />
-      About {APP_NAME}
+      Про {APP_NAME}
     </DropdownMenuItem>
   )
 
@@ -52,7 +52,7 @@ export function AppInfoTrigger({ trigger }: AppInfoTriggerProps) {
             />
             <DrawerTitle className="hidden">{APP_NAME}</DrawerTitle>
             <DrawerDescription className="hidden">
-              Your minimalist AI chat companion
+              Меньше рутины — больше результата
             </DrawerDescription>
           </DrawerHeader>
           <div className="px-4 pb-6">
@@ -77,7 +77,7 @@ export function AppInfoTrigger({ trigger }: AppInfoTriggerProps) {
           />
           <DialogTitle className="hidden">{APP_NAME}</DialogTitle>
           <DialogDescription className="hidden">
-            Your minimalist AI chat companion
+            Меньше рутины — больше результата
           </DialogDescription>
         </DialogHeader>
         <div className="p-4">

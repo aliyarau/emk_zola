@@ -39,7 +39,6 @@ export async function validateUserIdentity(
       .from("users")
       .select("id")
       .eq("id", userId)
-      .eq("anonymous", true)
       .maybeSingle()
 
     if (userError || !userRecord) {

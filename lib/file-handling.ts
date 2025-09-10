@@ -11,6 +11,8 @@ const ALLOWED_FILE_TYPES = [
   "image/jpeg",
   "image/png",
   "image/gif",
+  "image/webp",
+  "image/svg+xml",
   "application/pdf",
   "text/plain",
   "text/markdown",
@@ -18,17 +20,23 @@ const ALLOWED_FILE_TYPES = [
   "text/csv",
   "application/vnd.ms-excel",
   "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+
+  // добавляй ТОЛЬКО если действительно хочешь принимать:
+  // "image/heic","image/heif",
 ]
 
 export type Attachment = {
   name: string
   contentType: string
   url: string
+  bucket?: string
+  path?: string
+  size?: number
 }
 
 export async function validateFile(
   file: File
-): Promise<{ isValid: boolean; error?: string }> {
+): Promise<{ isValid: boolean; mime?: string; ext?: string; error?: string }> {
   if (file.size > MAX_FILE_SIZE) {
     return {
       isValid: false,
@@ -36,50 +44,49 @@ export async function validateFile(
     }
   }
 
-  const buffer = await file.arrayBuffer()
-  const type = await fileType.fileTypeFromBuffer(
-    Buffer.from(buffer.slice(0, 4100))
-  )
+  const buf = await file.arrayBuffer()
+  const head = Buffer.from(buf.slice(0, 4100))
+  const ft = await fileType.fileTypeFromBuffer(head)
 
-  if (!type || !ALLOWED_FILE_TYPES.includes(type.mime)) {
+  // Если не распознали магией — падаем обратно на file.type и расширение из имени
+  const fallbackExt = file.name.split(".").pop()?.toLowerCase()
+  const mime = ft?.mime || file.type || ""
+  const ext = ft?.ext || fallbackExt
+
+  // Разрешаем либо распознанный mime, либо заявленный браузером, если он в белом списке
+  const allowed =
+    (ft?.mime && ALLOWED_FILE_TYPES.includes(ft.mime)) ||
+    (file.type && ALLOWED_FILE_TYPES.includes(file.type))
+
+  if (!allowed) {
     return {
       isValid: false,
       error: "File type not supported or doesn't match its extension",
     }
   }
 
-  return { isValid: true }
+  return { isValid: true, mime: mime || undefined, ext: ext || undefined }
 }
 
 export async function uploadFile(
   supabase: SupabaseClient,
-  file: File
-): Promise<string> {
-  const fileExt = file.name.split(".").pop()
-  const fileName = `${Math.random().toString(36).substring(2)}.${fileExt}`
-  const filePath = `uploads/${fileName}`
+  file: File,
+  opts?: { mime?: string; ext?: string }
+): Promise<{ bucket: string; path: string }> {
+  const bucket = "chat-attachments"
+  const ext = (opts?.ext || file.name.split(".").pop() || "bin").toLowerCase()
+  const fileName = `${Math.random().toString(36).slice(2)}.${ext}`
+  const path = `uploads/${fileName}`
 
   const { error } = await supabase.storage
-    .from("chat-attachments")
-    .upload(filePath, file)
+    .from(bucket)
+    .upload(path, file, { contentType: opts?.mime || file.type || undefined })
 
   if (error) {
     throw new Error(`Error uploading file: ${error.message}`)
   }
 
-  const {
-    data: { publicUrl },
-  } = supabase.storage.from("chat-attachments").getPublicUrl(filePath)
-
-  return publicUrl
-}
-
-export function createAttachment(file: File, url: string): Attachment {
-  return {
-    name: file.name,
-    contentType: file.type,
-    url,
-  }
+  return { bucket, path }
 }
 
 export async function processFiles(
@@ -89,6 +96,9 @@ export async function processFiles(
 ): Promise<Attachment[]> {
   const supabase = isSupabaseEnabled ? createClient() : null
   const attachments: Attachment[] = []
+
+  // считаем, что chat-attachments приватный
+  const isPrivateBucket = (bucket: string) => bucket === "chat-attachments"
 
   for (const file of files) {
     const validation = await validateFile(file)
@@ -103,26 +113,60 @@ export async function processFiles(
     }
 
     try {
-      const url = supabase
-        ? await uploadFile(supabase, file)
-        : URL.createObjectURL(file)
-
-      if (supabase) {
-        const { error } = await supabase.from("chat_attachments").insert({
-          chat_id: chatId,
-          user_id: userId,
-          file_url: url,
-          file_name: file.name,
-          file_type: file.type,
-          file_size: file.size,
+      if (!supabase) {
+        // fallback для окружений без Supabase
+        attachments.push({
+          name: file.name,
+          contentType: file.type,
+          url: URL.createObjectURL(file),
+          size: file.size,
         })
-
-        if (error) {
-          throw new Error(`Database insertion failed: ${error.message}`)
-        }
+        continue
       }
 
-      attachments.push(createAttachment(file, url))
+      // 1) загружаем и получаем bucket+path
+      const { bucket, path } = await uploadFile(supabase, file, {
+        mime: validation.mime,
+        ext: validation.ext,
+      })
+
+      // 2) получаем display-URL
+      let url = ""
+      if (isPrivateBucket(bucket)) {
+        const { data, error } = await supabase.storage
+          .from(bucket)
+          .createSignedUrl(path, 60 * 60)
+        if (error) throw error
+        url = data.signedUrl
+      } else {
+        const { data } = supabase.storage.from(bucket).getPublicUrl(path)
+        url = data.publicUrl
+      }
+
+      // 3) пишем в БД (пока оставим file_url как есть)
+      const { error: dbError } = await supabase
+        .from("chat_attachments")
+        .insert({
+          chat_id: chatId,
+          user_id: userId,
+          file_url: url, // ⚠️ для приватного лучше хранить path и bucket, но оставляем твой контракт
+          file_name: file.name,
+          file_type: validation.mime || file.type,
+          file_size: file.size,
+          // file_bucket: bucket,      // ← добавь поле в таблицу, если решишь хранить
+          // file_path: path,          // ← стабильный ключ вместо короткоживущего URL
+        })
+      if (dbError)
+        throw new Error(`Database insertion failed: ${dbError.message}`)
+
+      attachments.push({
+        name: file.name,
+        contentType: validation.mime || file.type,
+        url,
+        bucket,
+        path,
+        size: file.size,
+      })
     } catch (error) {
       console.error(`Error processing file ${file.name}:`, error)
     }

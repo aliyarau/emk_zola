@@ -89,18 +89,17 @@ export function Chat() {
   )
 
   // Chat operations (utils + handlers) - created first
-  const { checkLimitsAndNotify, ensureChatExists, handleDelete, handleEdit } =
-    useChatOperations({
-      isAuthenticated,
-      chatId,
-      messages: initialMessages,
-      selectedModel,
-      systemPrompt,
-      createNewChat,
-      setHasDialogAuth,
-      setMessages: () => {},
-      setInput: () => {},
-    })
+  const { ensureChatExists, handleDelete, handleEdit } = useChatOperations({
+    isAuthenticated,
+    chatId,
+    messages: initialMessages,
+    selectedModel,
+    systemPrompt,
+    createNewChat,
+    setHasDialogAuth,
+    setMessages: () => {},
+    setInput: () => {},
+  })
 
   // Core chat functionality (initialization + state + actions)
   const {
@@ -125,7 +124,6 @@ export function Chat() {
     files,
     createOptimisticAttachments,
     setFiles,
-    checkLimitsAndNotify,
     cleanupOptimisticAttachments,
     ensureChatExists,
     handleFileUploads,
@@ -240,7 +238,7 @@ export function Chat() {
             }}
           >
             <h1 className="mb-6 text-3xl font-medium tracking-tight">
-              What&apos;s on your mind?
+              Ставь цель — я помогу
             </h1>
           </motion.div>
         ) : (

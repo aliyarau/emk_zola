@@ -7,7 +7,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip"
 import { cn } from "@/lib/utils"
-import { SidebarSimpleIcon } from "@phosphor-icons/react"
+import { PanelLeft } from "lucide-react"
 
 type HeaderSidebarTriggerProps = React.HTMLAttributes<HTMLButtonElement>
 
@@ -31,11 +31,13 @@ export function HeaderSidebarTrigger({
           )}
           {...props}
         >
-          <SidebarSimpleIcon size={20} />
-          <span className="sr-only">Toggle sidebar</span>
+          <PanelLeft size={20} />
+          <span className="sr-only">Переключить боковую панель</span>
         </button>
       </TooltipTrigger>
-      <TooltipContent>{open ? "Close sidebar" : "Open sidebar"}</TooltipContent>
+      <TooltipContent>
+        {open ? "Закрыть боковую панель" : "Открыть боковую панель"}
+      </TooltipContent>
     </Tooltip>
   )
 }

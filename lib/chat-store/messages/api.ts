@@ -3,6 +3,11 @@ import { isSupabaseEnabled } from "@/lib/supabase/config"
 import type { Message as MessageAISDK } from "ai"
 import { readFromIndexedDB, writeToIndexedDB } from "../persist"
 
+type MessageDbMeta = {
+  message_group_id?: string | null
+  model?: string | null
+}
+
 export async function getMessagesFromDb(
   chatId: string
 ): Promise<MessageAISDK[]> {
@@ -43,14 +48,16 @@ async function insertMessageToDb(chatId: string, message: MessageAISDK) {
   const supabase = createClient()
   if (!supabase) return
 
+  const m = message as MessageAISDK & MessageDbMeta
+
   await supabase.from("messages").insert({
     chat_id: chatId,
     role: message.role,
     content: message.content,
     experimental_attachments: message.experimental_attachments,
     created_at: message.createdAt?.toISOString() || new Date().toISOString(),
-    message_group_id: (message as any).message_group_id || null,
-    model: (message as any).model || null,
+    message_group_id: m.message_group_id ?? null,
+    model: m.model ?? null,
   })
 }
 
@@ -58,15 +65,18 @@ async function insertMessagesToDb(chatId: string, messages: MessageAISDK[]) {
   const supabase = createClient()
   if (!supabase) return
 
-  const payload = messages.map((message) => ({
-    chat_id: chatId,
-    role: message.role,
-    content: message.content,
-    experimental_attachments: message.experimental_attachments,
-    created_at: message.createdAt?.toISOString() || new Date().toISOString(),
-    message_group_id: (message as any).message_group_id || null,
-    model: (message as any).model || null,
-  }))
+  const payload = messages.map((message) => {
+    const m = message as MessageAISDK & MessageDbMeta
+    return {
+      chat_id: chatId,
+      role: message.role,
+      content: message.content,
+      experimental_attachments: message.experimental_attachments,
+      created_at: message.createdAt?.toISOString() || new Date().toISOString(),
+      message_group_id: m.message_group_id ?? null,
+      model: m.model ?? null,
+    }
+  })
 
   await supabase.from("messages").insert(payload)
 }
